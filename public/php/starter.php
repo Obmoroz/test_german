@@ -1,4 +1,24 @@
 <?php
+<?
+$mail = array(
+    'to' => 'test@gmail.com',
+    'subject' => 'Привет',
+    'body' => 'Это тестовое сообщение',
+);
+
+
+# Подключаемся к серверу Gearman
+$client = new GearmanClient();
+$client->addServer('127.0.0.1', '4730');
+
+
+# Шлем сообщение
+$client->doBackground('sendmail', json_encode($mail));
+
+
+
+
+
 if($_POST["button"]==true){
     $login=$_POST["login"];
     $password=$_POST["password"];
