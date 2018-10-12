@@ -1,19 +1,22 @@
 <?php
 $worker = new GearmanWorker();
-$worker->addServer();
+$worker->addServer('127.0.0.1','4730');
 
-$worker->addFunction('sendmail', 'send_mail');
+/*Тут мы говорим, что готовы обработать ф-ю function_revert_string_and_caps, и что заниматься этим будет ф-я 'revCaps*/
+$worker->addFunction('function_revert_string_and_caps', 'revCaps');
 
-while (1)
-{
-    $worker->work();
-    if ($worker->returnCode() != GEARMAN_SUCCESS) break;
-}
+/*Запускаем воркер. В таком варианте он отработает один раз*/
+//$worker->work();
 
-function send_mail($job)
-{
-    $workload = $job->workload();
-    $data = json_decode($workload, true);
-    var_dump($data);
-    //mail($data['to'], $data['subject'], $data['body']);
+/*А это вариант будет висеть демоном - есть на видео*/
+while($worker->work()){};
+
+
+//Ну и сама ф-я обработчик, аргумент один - объект-задание job
+function revCaps($job){
+
+    /*Извлекаем из job данные, переданные клиентом*/
+    $content = $job->workload();
+
+    return mb_strtoupper(strrev($content));
 }
